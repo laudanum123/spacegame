@@ -35,29 +35,17 @@ background = background.convert()
 starship = src.starship.starship()
 allsprites = pygame.sprite.RenderPlain(starship)
 
-myFont = pygame.font.SysFont("Arial", 18)
-accTextLabel = myFont.render("Acceleration:", 1, (255,255,255))
-speedTextLabel = myFont.render("Speed:", 1, (255,255,255))
-accel = (0,0)
 
 pygame.display.flip()
 
 while 1:
-    clock.tick(30)
+    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
-
-    accValLabel = myFont.render(str(accel), 1, (255, 255, 255))
-    speedValLabel = myFont.render(str(starship.speed), 1, (255, 255, 255))
-
     allsprites.update()
 
     screen.blit(background, (0, 0))
-    screen.blit(accTextLabel, (520, 20))
-    screen.blit(speedTextLabel, (520, 60))
-    screen.blit(speedValLabel, (600, 60))
-    screen.blit(accValLabel, (600, 20))
     allsprites.draw(screen)
     pygame.display.flip()

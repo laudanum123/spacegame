@@ -3,6 +3,10 @@ import src.utils
 import operator
 import math
 
+# CONSTANTS FOR STARSHIP BEHAVIOR
+DRAG = 0.1  # How fast does the starship lose its speed
+ACCEL = 0.2  # How fast does the sharship accelerate
+
 class starship(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -12,39 +16,52 @@ class starship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.speedx = 0
         self.speedy = 0
+        self.WIDTH, self.HEIGHT = pygame.display.get_surface().get_size()
+
 
     def update(self):
+        self.flight_control()
+        # move the ship to new position
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+
+        self.wrap_around()
+
+    def flight_control(self):
+        # handles everything related to simple starship flight
         # check if direction buttons are pressed
         keystate = pygame.key.get_pressed()
-
         if keystate[pygame.K_UP]:
             # up
-            self.speedy += -.2
+            self.speedy += -ACCEL
         elif keystate[pygame.K_LEFT]:
             # left
-            self.speedx += -.2
+            self.speedx += -ACCEL
         elif keystate[pygame.K_DOWN]:
             # down
-            self.speedy += .2
+            self.speedy += ACCEL
         elif keystate[pygame.K_RIGHT]:
             # right
-            self.speedx += .2
+            self.speedx += ACCEL
         else:
             # if no button is pressed slowly reduce speed
-            if self.speedy > 0.2:
-                self.speedy += -0.2
+            if self.speedy > DRAG:
+                self.speedy += -DRAG
+            elif self.speedy < -DRAG:
+                self.speedy += DRAG
+            if self.speedx > DRAG:
+                self.speedx += -DRAG
+            elif self.speedx < -DRAG:
+                self.speedx += DRAG
 
+    def wrap_around(self):
+        # if starship leaves the screen make it reappear at opposite side
 
-        # if no button is pressed the ship slowly loses speed
-        if self.engine_on == 0:
-            reduction_matrix = [0,0]
-            reduction_matrix[0] = math.copysign(.2, self.speed[0])
-            reduction_matrix[1] = math.copysign(.2, self.speed[1])
-            self.speed = tuple(map(operator.sub, self.speed, reduction_matrix))
-
-        # set the new speed
-        self.speed = tuple(map(operator.add, self.speed, self.accel))
-
-        # move the ship to new position
-        newpos = self.rect.move(self.speed)
-        self.rect = newpos
+        if self.rect.left > self.WIDTH+20:
+            self.rect.right = 0
+        if self.rect.right < -20:
+            self.rect.left = self.WIDTH
+        if self.rect.top > self.HEIGHT+20:
+            self.rect.bottom = 0
+        if self.rect.bottom < -20:
+            self.rect.top = self.HEIGHT
